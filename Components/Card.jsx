@@ -3,11 +3,12 @@ import React from "react";
 const Card = ({ allcampaign, setOpenModel, setDonate, title }) => {
   console.log(allcampaign);
 
-  const daysLeft = (deadline) => {
-    const difference = new Date(deadline).getTime() - Date.now();
-    const remainingDays = difference / (1000 * 3600 * 24);
-    return remainingDays.toFixed(0);
-  };
+  const daysLeft = (deadlineInSeconds) => {
+  const now = Math.floor(Date.now() / 1000); // current time in seconds
+  const difference = deadlineInSeconds - now;
+  const remainingDays = difference / (60 * 60 * 24); // seconds to days
+return remainingDays > 0 ? Math.ceil(remainingDays) : 0;
+};
 
   return (
     <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
@@ -15,7 +16,14 @@ const Card = ({ allcampaign, setOpenModel, setDonate, title }) => {
       <div className="grid gap-5 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
         {allcampaign?.map((campaign, i) => (
           <div
-            onClick={() => (setDonate(campaign), setOpenModel(true))}
+            onClick={() => {
+  if (campaign.deadline > Math.floor(Date.now() / 1000)) {
+    setDonate(campaign);
+    setOpenModel(true);
+  } else {
+    alert("This campaign has ended. You cannot donate.");
+  }
+}}
             key={i + 1}
             className="cursor-pointer border overflow-hidden transition-shadow duration-300 bg-white rounded"
           >
